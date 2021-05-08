@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.5.0 <0.9.0;
 
-contract Governance {
+contract Voting {
 
   /*list of PoliticalParties and candidates
   1. Європейська солідарність => Порошенко Пётр Алексеевич
@@ -10,9 +10,11 @@ contract Governance {
   */
 
   address owner;
+  uint public value;
 
-  constructor () {
+  constructor (uint _value) {
     owner = msg.sender;
+    value = _value;
  }
 
   // Counters
@@ -48,12 +50,12 @@ contract Governance {
 
 
 
-  function addpoliticalParty (string memory _politicalPartyName) onlyOwner public {
-    politicalParty_id++;
+  function addPoliticalParty (string memory _politicalPartyName) onlyOwner public {
+    politicalParty_id += 1;
     PoliticalParties[politicalParty_id].politicalPartyName = _politicalPartyName;
   }
 
-  function addcandidate (string memory _candidateName, uint _politicalParty_id) onlyOwner public {
+  function addCandidate (string memory _candidateName, uint _politicalParty_id) onlyOwner public {
     candidate_id++;
     Candidates[candidate_id].candidateName=_candidateName;
     Candidates[candidate_id].politicalParty_id= _politicalParty_id;
@@ -61,13 +63,13 @@ contract Governance {
   // 1. добавить кандидата
   // 2. Проверить имя id партии
 
-   function Voting (uint _candidate_id) public {
-    require (_candidate_id <= candidate_id,"There are no candidates with this id");
-    require (Voters[msg.sender].vote != true,"You have already voted!");
-    Voters[msg.sender].electedid = _candidate_id;
-    Voters[msg.sender].vote = true;
-    Candidates[_candidate_id].amount++;
-    }
+  //  function VotingProcess (uint _candidate_id) public {
+  //   require (_candidate_id <= candidate_id,"There are no candidates with this id");
+  //   require (Voters[msg.sender].vote != true,"You have already voted!");
+  //   Voters[msg.sender].electedid = _candidate_id;
+  //   Voters[msg.sender].vote = true;
+  //   Candidates[_candidate_id].amount++;
+  //   }
 
 //   function WhoIsTheWinner () public {
 //         int max;

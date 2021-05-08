@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/stepanetssergey/course_solidity/issues"
   },
-  "homepage": "https://github.com/stepanetssergey/course_solidity#readme"
+  "homepage": "https://github.com/stepanetssergey/course_solidity#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.1.0"
+  }
 }
