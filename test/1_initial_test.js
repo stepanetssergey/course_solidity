@@ -93,9 +93,42 @@ contract("Voting", accounts => {
         assert.equal(token_balance_account.toNumber(),0,"Not correct balance after transfere")
     })
 
+    it("Set voting contract address in transport contract", async() => {
+        const voting = await Voting.deployed();
+        const transport_contract = await TransportCity.deployed();
+        await transport_contract.setVotingContractAddress(voting.address);
+        const voting_contract_address = await transport_contract.voting_contract_address.call()
+        assert.equal(voting_contract_address, voting.address, "Not correct voting address in transport contract")
+    })
+
+    it("Approve token transfer for transport tokens", async() => {
+        const transport_contract = await TransportCity.deployed();
+        const transport_token = await TransportToken.deployed();
+        await transport_token.approve(transport_contract.address, 10, {from: accounts[2]})
+    })
+
+    it("Transfer tokens to transport contract", async() => {
+        const transport_contract = await TransportCity.deployed();
+        await transport_contract.getPayment(10, {from: accounts[2]});
+        const transport_token = await TransportToken.deployed();
+        const customer_balance = await transport_token.balanceOf(accounts[2]);
+        assert.equal(customer_balance, 0, "Not correct customer balance")
+    })
+
+    it("Transfer transport tokens to test user-3", async() => {
+        const transport_token = await TransportToken.deployed();
+        await transport_token.transfer(accounts[3], 10);
+        const check_transfer_to_accounts3 = await transport_token.balanceOf(accounts[3]);
+        assert.equal(check_transfer_to_accounts3, 10, "Not correct transfer to account 3")
+    })
     
-
-
+    it("Transfer tokens to transport contract from accounts 3 (without voting)", async() => {
+        const transport_contract = await TransportCity.deployed();
+        await transport_contract.getPayment(10, {from: accounts[3]});
+        const transport_token = await TransportToken.deployed();
+        const customer_balance = await transport_token.balanceOf(accounts[3]);
+        assert.equal(customer_balance, 10, "Not correct customer balance")
+    })
 
 })
 

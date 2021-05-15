@@ -61,8 +61,20 @@ contract Voting {
     vote_token_address = _vote_token_address;
   }
 
+  function checkVoter(address _address) external view returns(bool) {
+    if (Voters[_address].vote) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   function setTransportTokenAddress(address _transport_token_address)  onlyOwner public {
     transport_token_address = _transport_token_address;
+  }
+
+  function getTransportTokenAddress() external view returns(address) {
+    return transport_token_address;
   }
 
   function addPoliticalParty (string memory _politicalPartyName) onlyOwner public {
@@ -88,6 +100,7 @@ contract Voting {
     IERC20 _transport_token = IERC20(transport_token_address);
     _transport_token.transfer(msg.sender, 10);
     Candidates[_candidat_id].amount += 1;
+    Voters[msg.sender].vote = true;
     emit TransferTokenGetMoney(msg.sender);
   }
 
