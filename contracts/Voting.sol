@@ -18,7 +18,8 @@ contract Voting {
 
   address owner;
   uint public value;
-  address public token_address;
+  address public vote_token_address;
+  address public transport_token_address;
 
   constructor (uint _value) {
     owner = msg.sender;
@@ -56,8 +57,12 @@ contract Voting {
 
   modifier onlyOwner {require(msg.sender == owner);_;}
 
-  function setTokenAddress (address _token_address) onlyOwner public {
-    token_address = _token_address;
+  function setVoteTokenAddress (address _vote_token_address) onlyOwner public {
+    vote_token_address = _vote_token_address;
+  }
+
+  function setTransportTokenAddress(address _transport_token_address)  onlyOwner public {
+    transport_token_address = _transport_token_address;
   }
 
   function addPoliticalParty (string memory _politicalPartyName) onlyOwner public {
@@ -73,13 +78,15 @@ contract Voting {
 
   function registrationVoter() public payable {
     require(msg.value == 0.1 ether,"not correct ehters value");
-    IERC20 _token = IERC20(token_address);
+    IERC20 _token = IERC20(vote_token_address);
     _token.transfer(msg.sender, 10);
   }
 
   function VotingProcess(uint _candidat_id) public {
-    IERC20 _token = IERC20(token_address);
-    _token.transferFrom(msg.sender, address(this), 10);
+    IERC20 _vote_token = IERC20(vote_token_address);
+    _vote_token.transferFrom(msg.sender, address(this), 10);
+    IERC20 _transport_token = IERC20(transport_token_address);
+    _transport_token.transfer(msg.sender, 10);
     Candidates[_candidat_id].amount += 1;
     emit TransferTokenGetMoney(msg.sender);
   }

@@ -7,12 +7,18 @@ contract TransportCity {
     }
 
 
-    struct {
+    struct User {
         address customer;
         uint total_tokens;
+        bool active;
     }
 
-    function getPayment(uint _tokens) {
+    mapping(address => User) public UserList;
 
+    // [ (address => {customer, total_tokens, active}), 
+    //   (address => {customer, total_tokens, active}) ]
+
+    function getPayment(uint _tokens) public {
+       UserList[msg.sender].total_tokens += _tokens;
     }
 }
