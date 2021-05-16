@@ -1,18 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.5.0 <0.9.0;
 
-contract Governance {
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+contract Voting {
 
   /*list of PoliticalParties and candidates
   1. Європейська солідарність => Порошенко Пётр Алексеевич
   2.Справедливість => Николаенко Станислав Николаевич
   3.Трудова Україна => Сопельник Владимир Иванович
+  VM
+  storage
+  memory
+  stack
   */
+  event TransferTokenGetMoney(address _sender);
 
   address owner;
+  uint public value;
+  address public vote_token_address;
+  address public transport_token_address;
 
-  constructor () {
+  constructor (uint _value) {
     owner = msg.sender;
+    value = _value;
  }
 
   // Counters
@@ -46,38 +57,69 @@ contract Governance {
 
   modifier onlyOwner {require(msg.sender == owner);_;}
 
+  function setVoteTokenAddress (address _vote_token_address) onlyOwner public {
+    vote_token_address = _vote_token_address;
+  }
 
+  function checkVoter(address _address) external view returns(bool) {
+    if (Voters[_address].vote) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  function addpoliticalParty (string memory _politicalPartyName) onlyOwner public {
-    politicalParty_id++;
+  function setTransportTokenAddress(address _transport_token_address)  onlyOwner public {
+    transport_token_address = _transport_token_address;
+  }
+
+  function getTransportTokenAddress() external view returns(address) {
+    return transport_token_address;
+  }
+
+  function addPoliticalParty (string memory _politicalPartyName) onlyOwner public {
+    politicalParty_id += 1;
     PoliticalParties[politicalParty_id].politicalPartyName = _politicalPartyName;
   }
 
-  function addcandidate (string memory _candidateName, uint _politicalParty_id) onlyOwner public {
+  function addCandidate (string memory _candidateName, uint _politicalParty_id) onlyOwner public {
     candidate_id++;
     Candidates[candidate_id].candidateName=_candidateName;
     Candidates[candidate_id].politicalParty_id= _politicalParty_id;
   }
-  // 1. добавить кандидата
-  // 2. Проверить имя id партии
 
-   function Voting (uint _candidate_id) public {
-    require (_candidate_id <= candidate_id,"There are no candidates with this id");
-    require (Voters[msg.sender].vote != true,"You have already voted!");
-    Voters[msg.sender].electedid = _candidate_id;
+  function registrationVoter() public payable {
+    require(msg.value == 0.1 ether,"not correct ehters value");
+    IERC20 _token = IERC20(vote_token_address);
+    _token.transfer(msg.sender, 10);
+  }
+
+  function VotingProcess(uint _candidat_id) public {
+    IERC20 _vote_token = IERC20(vote_token_address);
+    _vote_token.transferFrom(msg.sender, address(this), 10);
+    IERC20 _transport_token = IERC20(transport_token_address);
+    _transport_token.transfer(msg.sender, 10);
+    Candidates[_candidat_id].amount += 1;
     Voters[msg.sender].vote = true;
-    Candidates[_candidate_id].amount++;
-    }
+    emit TransferTokenGetMoney(msg.sender);
+  }
 
-//   function WhoIsTheWinner () public {
-//         int max;
 
-//             for (int8 i; i < candidate_id;i++) {
-//                 if (Candidates[i].amount > max) {
-//                     max = Candidates[i].amount;
-//                     winner = Candidates[i].candidateName;
-//                 }
-//             }
-//     }
+  // function createNFTVotingToken(string memory _id_code) public {
+
+  // }
+
+  /*
+  1. Випустити транспортні токени (Transport tokens, TR-TRN)
+     - in folder migration
+     - total supply, transfer
+  2. При голосуванні перечиляти по 10 токенів на рахунок виборця. 
+     - при голосуванні що куди іде (перечислення токенів)
+  3. Написати смарт контракт транспортної компанії
+     - отримання токенів від громадян і т.д.
+  4. В цьому контракті повинна бути функція зарахування токенів за проїзд 
+  5. При зарахуванні в контракті база сумує всі токени які перечислив виборець
+
+  */
 
 }
