@@ -30,6 +30,8 @@ contract Voting {
   uint public politicalParty_id;
   uint public candidate_id;
   string public winner;
+  
+
 
   // Mappinngs
   mapping (uint => politicalParty) public PoliticalParties;
