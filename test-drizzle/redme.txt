@@ -1,0 +1,8 @@
+npm -i @drizzle/react-components 
+npm -i @drizzle/react-plugin
+npm -i @drizzle/store
+
+npm -i @drizzle/store @drizzle/react-plugin
+
+create drizzleOptions.js
+
